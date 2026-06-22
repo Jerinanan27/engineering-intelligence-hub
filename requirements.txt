@@ -1,3 +1,4 @@
+-e .
 sentence-transformers>=3.0
 qdrant-client>=1.9
 rank-bm25>=0.2.2
@@ -7,6 +8,3 @@ pydantic>=2.6
 streamlit>=1.33
 requests>=2.31
 PyYAML>=6.0
-# optional: AST-aware code chunking (graceful fallback if absent)
-# optional dev/test
-pytest>=8.0
