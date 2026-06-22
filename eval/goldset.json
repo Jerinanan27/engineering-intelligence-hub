@@ -1,0 +1,6 @@
+[
+  {"question": "How are JWTs validated?", "relevant_doc_ids": ["auth-service", "auth"]},
+  {"question": "What caused the auth outage on Nov 3?", "relevant_doc_ids": ["INC-2025-014"]},
+  {"question": "How do I roll back a production deploy?", "relevant_doc_ids": ["deployment"]},
+  {"question": "What algorithm signs the access tokens?", "relevant_doc_ids": ["auth-service", "auth"]}
+]

@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: engineering-intelligence-hub
+Version: 0.1.0
+Summary: Developer-focused hybrid RAG over docs, code, incidents and diagrams.
+Requires-Python: >=3.10
