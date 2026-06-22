@@ -1,5 +1,9 @@
 # Engineering Intelligence Hub
 
+🔗 **Live Demo:** https://engineering-intelligence-app-ojzakhcjhz6depgb7ppehz.streamlit.app/
+
+> Ask engineering questions across docs, code, incidents, and architecture diagrams — grounded answers with cited sources.
+
 A developer-focused **Retrieval-Augmented Generation (RAG)** system that ingests
 heterogeneous engineering knowledge — technical docs, source code, incident
 reports (and architecture diagrams, on the roadmap) — and answers questions with
