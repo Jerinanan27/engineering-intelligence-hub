@@ -1,12 +1,19 @@
 """Streamlit demo UI. Run: streamlit run src/eih/ui.py
 
 A deliberately minimal, editorial layout: ask a question, see the grounded
-answer, and inspect the exact sources + retrieval scores behind it. The source
-inspector is the part that signals engineering depth to a reviewer.
+answer, and inspect the exact sources + retrieval scores behind it. When a
+matched source is an architecture diagram, the original image is shown inline.
 """
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 import streamlit as st
+
+# Bridge Streamlit's secret store into the environment the LLM/vision code reads.
+if "GROQ_API_KEY" in st.secrets and not os.getenv("GROQ_API_KEY"):
+    os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 from eih import EngineeringIntelligenceHub, SourceType
 
@@ -21,7 +28,7 @@ def get_hub():
 
 
 st.title("Engineering Intelligence Hub")
-st.caption("Hybrid RAG over docs, code & incidents — grounded, cited answers.")
+st.caption("Hybrid RAG over docs, code, incidents & architecture diagrams — grounded, cited answers.")
 
 hub = get_hub()
 
@@ -50,4 +57,10 @@ if question:
     for i, c in enumerate(ans.citations, 1):
         src = c.chunk.metadata.get("path", c.chunk.doc_id)
         with st.expander(f"[{i}] {src}  ·  {c.chunk.source_type.value}  ·  score {c.score:.3f}"):
+            # For diagrams, show the actual image alongside its captioned text.
+            if c.chunk.source_type == SourceType.DIAGRAM:
+                img_path = c.chunk.metadata.get("path")
+                if img_path and Path(img_path).exists():
+                    st.image(img_path, caption="Matched architecture diagram")
+                st.caption("Vision-model description used for retrieval:")
             st.code(c.chunk.text)

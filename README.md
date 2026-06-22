@@ -26,6 +26,12 @@ content. This system addresses the specific failure modes:
 | Answers hallucinate / can't be audited | Prompt forces **answer-from-context-only** with **inline `[n]` citations**; UI shows the exact source chunks and scores |
 | "It works on my 5 examples" | A small **evaluation harness** (hit@k, MRR, citation rate) against a gold set |
 
+**Architecture diagrams** (images) are supported via **vision captioning**: a hosted
+vision model (Groq Llama 4 Scout) reads each diagram and writes a structured text
+description, which is embedded and retrieved by the same pipeline as text. No
+heavy vision model runs in the app — captions are generated once, offline, and
+cached on disk (`<image>.caption.txt`), so deployment stays free-tier-friendly.
+
 A deliberate design decision worth calling out: **a single unified embedder is
 used for all source types.** Mixing embedders with different dimensions/vector
 spaces in one collection silently breaks similarity search. A per-modality
@@ -137,6 +143,7 @@ src/eih/
   ingestion/
     chunkers.py    # structure-aware doc + AST code chunking
     loaders.py     # per-type loaders + metadata extraction
+    vision.py      # diagram captioning (Groq Llama 4 Scout) + caption cache
   embeddings.py    # sentence-transformers wrapper
   store.py         # Qdrant wrapper (in-memory or server)
   retrieval.py     # dense + BM25 + RRF + cross-encoder rerank
@@ -147,13 +154,24 @@ src/eih/
   ui.py            # Streamlit demo
 ```
 
+## Adding your own architecture diagrams
+
+1. Drop image files (`.png` / `.jpg`) into `data/sample/diagrams/`.
+2. Generate captions once, offline, with your Groq key:
+   ```bash
+   export GROQ_API_KEY=...
+   python scripts/caption_diagrams.py data/sample/diagrams
+   ```
+   This writes a `<image>.caption.txt` next to each image.
+3. Commit the images **and** their `.caption.txt` files. The deployed app reads
+   the cached captions and never calls the vision API at startup.
+
 ## Roadmap
 
-- **Architecture diagrams** — caption images with a local vision-language model
-  (LLaVA / Qwen2-VL via Ollama) into structured text, embed the caption, store
-  the image reference. This is the 4th source type and the biggest differentiator.
 - **Per-modality embedders** — multi-collection design with cross-collection
   fusion, so code can use a code-specialized embedder.
+- **SVG / Mermaid diagrams as text** — read vector-diagram source directly
+  (labels are already text) instead of captioning a rasterized image.
 - **Repo ingestion at scale** — git-aware loader, language detection, incremental
   re-index on commit.
 - **RAGAS metrics** + a small labeled benchmark.

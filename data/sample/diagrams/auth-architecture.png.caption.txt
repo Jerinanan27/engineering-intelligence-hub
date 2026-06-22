@@ -1,0 +1,9 @@
+Architecture diagram titled "Authentication Flow (RS256 JWT)". It shows five
+components: a Client, an API Gateway, the Auth Service (auth-svc), Vault at path
+secret/auth/jwt, and a JWKS endpoint at /.well-known. The Client sends a Bearer
+JWT to the API Gateway. The API Gateway forwards the token to the Auth Service to
+verify the token. The Auth Service fetches keys from the JWKS /.well-known
+endpoint and reads the RS256 signing key from Vault (secret/auth/jwt). After
+validation, user identity is passed back toward the gateway as X-User-Claims.
+The diagram depicts how RS256 JWT validation flows across the gateway, auth
+service, Vault secret store, and JWKS key endpoint.
